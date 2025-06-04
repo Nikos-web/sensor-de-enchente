@@ -1,0 +1,96 @@
+// C++ code
+//
+
+#define	LEDr	11	
+#define	LEDb	10
+#define	LEDy	9
+#define	pot		A0
+#define	spkr	8
+
+
+int potReading = 0;	//initialise potentiometerReading variable
+int	pirReading = 0;	//initialise PassiveInfraRedReading variable
+int a = 0;			//initialise potentiometer map reading variable
+long cm = 0;
+long b = 0;
+
+void setup()
+{
+  Serial.begin(15000);
+  
+  pinMode(LEDr, OUTPUT);	//set up pinMode LED RED
+  pinMode(LEDb, OUTPUT);	//set up pinMode LED BLUE
+  pinMode(LEDy, OUTPUT);	//set up pinMode LED YELLOW
+  pinMode(pot, INPUT);		//set up pinMode Potentiometer
+  pinMode(spkr,	OUTPUT);	//set up pinMode Speaker
+  pinMode(6, INPUT);		//set up pinMode PIR Sensor
+ 
+}
+
+long readUltrasonicDistance(int triggerPin, int echoPin){
+  pinMode(triggerPin, OUTPUT);	// Clear the trigger
+  digitalWrite(triggerPin, LOW);
+  delayMicroseconds(2);
+  //Sets the trigger pin to HIGH state for 10 microseconds
+  digitalWrite(triggerPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(triggerPin, LOW);
+  pinMode(echoPin, INPUT);
+  // Reads the eco pin, and returns the sound wave travel time in microseconds
+  return (pulseIn(echoPin, HIGH)*0.01723); 
+}
+
+void loop()
+{
+  cm = readUltrasonicDistance(7, 6);
+  b  = readUltrasonicDistance(7, 6)*0.39370;
+ 
+  
+  potReading = analogRead(pot);	
+  a = map(potReading, 0, 1023, 0, 255);
+  
+  //pirReading = digitalRead(6);	
+  
+  //Serial.println(a);	//display potentiometer reading at the serial monitor
+  //Serial.println(pirReading);	//display pirsensor reading at the serial monitor
+  Serial.print(b);	//display ultrasonic reading at the serial monitor
+  Serial.print(" inch ");	//display cm at the serial monitor
+   
+  Serial.print(cm);	//display ultrasonic reading at the serial monitor
+  Serial.print(" cm");	//display cm at the serial monitor
+  
+  Serial.println(" "); 
+  
+  if(cm < 80)
+  {
+    tone(spkr, 1000, 500);		// Speaker is set to give output at 1000Hz and 500ms delay
+    
+    digitalWrite (LEDr, HIGH);	// The LED is on
+	delay(0);
+    delay (a); 					// Wait for the value read by the analog pin 0
+	digitalWrite (LEDr, LOW);	// Turn off the LED
+	delay(0);
+    delay (a);					// Wait again for the time read by the analog pin 0
+    
+    digitalWrite (LEDb, HIGH);	// The LED is on
+	delay(0);
+    delay (a); 					// Wait for the value read by the analog pin 0
+	digitalWrite (LEDb, LOW);	// Turn off the LED
+	delay(0);
+    delay (a);					// Wait again for the time read by the analog pin 0
+    
+    digitalWrite (LEDy, HIGH);	// The LED is on
+	delay(0);
+    delay (a); 					// Wait for the value read by the analog pin 0
+	digitalWrite (LEDy, LOW);	// Turn off the LED
+	delay(0);
+    delay (a);					// Wait again for the time read by the analog pin 0
+  }
+  else
+  {
+    digitalWrite (LEDr, LOW);	// All LED off
+    digitalWrite (LEDb, LOW);
+    digitalWrite (LEDy, LOW);
+  }
+
+}
